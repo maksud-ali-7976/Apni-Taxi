@@ -132,17 +132,15 @@ export async function forgotPasswordHandler(req, res) {
 
     await user.save();
 
-    await passwordResetRequestEmail(
-      user.email,
-      `${process.env.FRONT_END_URL}resetPassword/${resetToken}`
-    );
-
     return res.status(200).json({
       success: true,
       message: "Reset Password Link Send in Your email",
+      token: resetToken,
     });
   } catch (error) {
-    return res.status(500).json({ message: "Internal Server Error" });
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal Server Error" });
   }
 }
 
@@ -152,11 +150,10 @@ export async function ResetPasswordHandler(req, res) {
   try {
     const user = await User.findOne({
       resetPasswordToken: token,
-      resetPasswordTokenExpiredAt: { $gt: Date.now() },
     });
     if (!user) {
       return res
-        .status(400)
+        .status(402)
         .json({ success: false, message: "InValid Or Expired Token" });
     }
 
@@ -167,7 +164,6 @@ export async function ResetPasswordHandler(req, res) {
     user.resetPasswordTokenExpiredAt = undefined;
 
     await user.save();
-    await passwordResetSuccessEmail(user.email, user.name);
     return res
       .status(200)
       .json({ success: true, message: "Password Reset SuccessFully" });
