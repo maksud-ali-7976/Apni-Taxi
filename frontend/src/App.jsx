@@ -14,6 +14,9 @@ import { useDispatch } from "react-redux";
 import { checkAuth } from "./toolkit/thunk/user";
 import ThankYou from "./page/ThankYou";
 import BookedRide from "./page/Admin/BookedRide";
+import ProtectedRoute from "./middleware/Protected";
+import ForgotPassword from "./page/FrogotPassword";
+import ResetPass from "./page/ResetPass";
 
 const SignUp = React.lazy(() => import("./page/SignUp"));
 function App() {
@@ -21,7 +24,11 @@ function App() {
   const location = useLocation();
 
   useEffect(() => {
-    if (!["/login", "/signup"].includes(location.pathname))
+    if (
+      !location.pathname == "localhost:5173/login" &&
+      !location.pathname == "localhost:5173/signup" &&
+      location.pathname == "localhost:5173/reset-password/:token"
+    )
       dispatch(checkAuth());
   }, [dispatch, location.pathname]);
 
@@ -33,14 +40,16 @@ function App() {
             <Route path="/signup" element={<SignUp />} />
             <Route path="/login" element={<SignIn />} />
             <Route path="/verify-email" element={<EmailVerify />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPass />} />
           </Route>
 
-          <Route element={<Protected allowedRoles={["user"]} />}>
+          <Route element={<ProtectedRoute allowedRoles={["user"]} />}>
             <Route index element={<Home />} />
             <Route path="/check-out" element={<ThankYou />} />
           </Route>
 
-          <Route element={<Protected allowedRoles={["admin"]} />}>
+          <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
             <Route path="/admin">
               <Route index element={<Dashboard />} />
               <Route path="drivers" element={<Drivers />} />

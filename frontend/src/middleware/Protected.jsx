@@ -7,14 +7,21 @@ const ProtectedRoute = ({ allowedRoles }) => {
     (state) => ({
       isAuthenticated: state.auth.isAuthenticated,
       user: state.auth.user,
+      isLoading: state.auth.isLoading,
     }),
     shallowEqual
   );
+
+ 
   if (!isAuthenticated && !user?.role) {
     return <Navigate to="/login" replace />;
   }
 
-  if (allowedRoles?.length > 0 && user?.role && !allowedRoles.includes(user?.role)) {
+  if (
+    allowedRoles?.length > 0 &&
+    user?.role &&
+    !allowedRoles.includes(user?.role)
+  ) {
     return <Navigate to="/UnAuthorized" replace />;
   }
 
